@@ -67,7 +67,6 @@ function createNote(id, content, x, y) {
     activeWindows.delete(id);
   });
 }
-
 // listen to Supabase
 function initSupabaseRealtime() {
   supabase
@@ -79,6 +78,12 @@ function initSupabaseRealtime() {
     .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'notes' }, (payload) => {
       const targetWin = activeWindows.get(payload.old.id);
       if (targetWin) targetWin.close();
+    })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'notes' }, (payload) => {
+      const {id, content, x_pos, y_pos } = payload.new;
+      const targetWin = activeWindows.get(payload.id);
+      if (targetWin) targetWin.webContents.send('load-note-content', { id, content });
+      //console.log("works");
     })
     .subscribe();
 }
@@ -140,6 +145,7 @@ app.whenReady().then(() => {
               callSupabase();
             } 
             else if (command === 'hide') {
+              console.log(activeWindows);
               const allWindows = BrowserWindow.getAllWindows();
               allWindows.forEach((win) => {
                 // Check if the current window is not the one you want to keep
