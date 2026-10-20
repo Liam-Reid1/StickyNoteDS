@@ -44,6 +44,12 @@
     document.getElementById('closeBtn').addEventListener('click', () => {
       if (currentNoteId) window.electronAPI.onDeleteNote(currentNoteId);
     });
+
+
+    document.getElementById('noteArea').addEventListener('change', () => {
+      const val = document.getElementById('noteArea').value;
+      if (currentNoteId) window.electronAPI.onUpdateText(currentNoteId, val);
+    });
   </script>
 </body>
 </html>

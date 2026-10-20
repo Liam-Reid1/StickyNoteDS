@@ -38,7 +38,6 @@ function createWindow() {
 let activeWindows = new Map();
 
 function createNote(id, content, x, y) {
-
   if (activeWindows.has(id)) return; // Prevent duplicate windows for the same record
 
   const win = new BrowserWindow({
@@ -56,7 +55,6 @@ function createNote(id, content, x, y) {
       nodeIntegration: false
     }
   });
-
   win.loadFile('note.html');
   activeWindows.set(id, win);
 
@@ -85,6 +83,20 @@ function initSupabaseRealtime() {
     .subscribe();
 }
 
+async function callSupabase() {
+  console.log(activeWindows);
+  const { data: rows, error } = await supabase
+    .from('notes')
+    .select('*');
+
+  if (rows) {
+    for (const row of rows) {
+      createNote(row.id, row.content, row.x_pos, row.y_pos); // spawn each note on local
+      console.log(row.id);
+    }
+  }
+}
+
 // Bridge note user interface request to write back to Supabase
 ipcMain.handle('create-new-note', async (_, text) => {
   const randomX = Math.floor(Math.random() * 500) + 100;
@@ -96,9 +108,14 @@ ipcMain.handle('close-and-delete-note', async (_, id) => {
   await supabase.from('notes').delete().eq('id', id);
 }); // currently can only delete notes individually
 
+ipcMain.handle('update-text', async (_, id, text) => {
+  await supabase.from('notes').update([{content: text}]).eq('id', id);
+});
+
 app.whenReady().then(() => { 
     initSupabaseRealtime(); 
     createWindow(); 
+    callSupabase();
     ipcMain.on('execute-custom-command', async (event, command) => { // custom commands from renderer.js
         console.log(`Command: ${command}`); 
 
@@ -120,16 +137,16 @@ app.whenReady().then(() => {
                 console.log('Note created successfully:', data);
             }
             else if (command === 'grab') { // pulls all rows from notes
-              const { data: rows, error } = await supabase
-                .from('notes')
-                .select('*');
-
-              if (rows) {
-                for (const row of rows) {
-                  createNote(row.id, row.content, row.x_pos, row.y_pos); // spawn each note on local
-                  console.log(row.id);
+              callSupabase();
+            } 
+            else if (command === 'hide') {
+              const allWindows = BrowserWindow.getAllWindows();
+              allWindows.forEach((win) => {
+                // Check if the current window is not the one you want to keep
+                if (win !== mainWindow) {
+                  win.close();
                 }
-              }
+              });
             } else { 
                 console.log(`Unknown command: ${command}`); 
             } 
