@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      background: #fef68a; font-family: sans-serif; margin: 0; padding: 12px;
+      display: flex; flex-direction: column; height: 100vh; box-sizing: border-box;
+      border: 2px solid #eab308; border-radius: 4px;
+      -webkit-app-region: drag;
+      cursor: grab;
+    }
+    .header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .close-btn { cursor: pointer; font-weight: bold; background: none; border: none; color: #a16207; -webkit-app-region: no-drag; }
+    textarea { flex: 1; background: transparent; border: none; resize: none; font-size: 16px; outline: none; -webkit-app-region: no-drag; }
+    .footer { display: flex; justify-content: flex-end; }
+    .add-btn { background: #eab308; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; color: white; font-weight: bold; -webkit-app-region: no-drag;}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <button class="close-btn" id="closeBtn">[X]</button>
+  </div>
+  <textarea id="noteArea" placeholder="Type something..."></textarea>
+  <div class="footer">
+    <button class="add-btn" id="addBtn">+</button>
+  </div>
+
+  <script>
+    let currentNoteId = null;
+
+    window.electronAPI.onLoadContent((data) => {
+      currentNoteId = data.id;
+      document.getElementById('noteArea').value = data.content;
+      if(currentNoteId === 'host-manager') {
+        document.getElementById('closeBtn').style.display = 'none';
+      }
+    });
+
+    document.getElementById('addBtn').addEventListener('click', () => {
+      const val = document.getElementById('noteArea').value;
+      window.electronAPI.onCreateNote(val || "Empty note");
+    });
+
+    document.getElementById('closeBtn').addEventListener('click', () => {
+      if (currentNoteId) window.electronAPI.onDeleteNote(currentNoteId);
+    });
+  </script>
+</body>
+</html>
