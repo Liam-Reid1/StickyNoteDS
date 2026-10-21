@@ -31,11 +31,6 @@
     window.electronAPI.onLoadContent((data) => {
       currentNoteId = data.id;
       document.getElementById('noteArea').value = data.content;
-      if(currentNoteId === 'host-manager') {
-        document.getElementById('closeBtn').style.display = 'none';
-        document.body.style.left = data.x + 'px'
-        document.body.style.top = data.y + 'px'
-      }
     });
 
     document.getElementById('addBtn').addEventListener('click', () => {

@@ -61,7 +61,7 @@ function createNote(id, content, x, y) {
   // send content data once webContents finish loading
   win.webContents.on('did-finish-load', () => {
     const [x_pos, y_pos] = win.getPosition();
-    win.webContents.send('load-note-content', { id, content, x_pos, y_pos});
+    win.webContents.send('load-note-content', { id, content });
   });
   win.on('moved', () => {
     const [x_pos, y_pos] = win.getPosition();
@@ -88,7 +88,11 @@ function initSupabaseRealtime() {
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'notes' }, (payload) => {
       const {id, content, x_pos, y_pos } = payload.new;
       const targetWin = activeWindows.get(payload.old.id);
-      if (targetWin) targetWin.webContents.send('load-note-content', { id, content, x_pos, y_pos });
+      if (targetWin) {
+        targetWin.webContents.send('load-note-content', { id, content, x_pos, y_pos });
+        console.log("movcing");
+        targetWin.setPosition(x_pos, y_pos);
+      }
     })
     .subscribe();
 }
