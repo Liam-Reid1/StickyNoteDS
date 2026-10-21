@@ -33,6 +33,8 @@
       document.getElementById('noteArea').value = data.content;
       if(currentNoteId === 'host-manager') {
         document.getElementById('closeBtn').style.display = 'none';
+        document.body.style.left = data.x + 'px'
+        document.body.style.top = data.y + 'px'
       }
     });
 
@@ -48,7 +50,7 @@
 
     document.getElementById('noteArea').addEventListener('change', () => {
       const val = document.getElementById('noteArea').value;
-      if (currentNoteId) window.electronAPI.onUpdateText(currentNoteId, val);
+      if (currentNoteId) window.electronAPI.onUpdateContent({id: currentNoteId, content: val});
     });
   </script>
 </body>

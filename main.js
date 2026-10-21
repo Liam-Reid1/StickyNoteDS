@@ -60,7 +60,13 @@ function createNote(id, content, x, y) {
 
   // send content data once webContents finish loading
   win.webContents.on('did-finish-load', () => {
-    win.webContents.send('load-note-content', { id, content });
+    const [x_pos, y_pos] = win.getPosition();
+    win.webContents.send('load-note-content', { id, content, x_pos, y_pos});
+  });
+  win.on('moved', () => {
+    const [x_pos, y_pos] = win.getPosition();
+    moveSupabase(id, x_pos, y_pos);
+    //win.webContents.send('load-note-content', { id, content, x_pos, y_pos});
   });
 
   win.on('closed', () => {
@@ -81,11 +87,26 @@ function initSupabaseRealtime() {
     })
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'notes' }, (payload) => {
       const {id, content, x_pos, y_pos } = payload.new;
-      const targetWin = activeWindows.get(payload.id);
-      if (targetWin) targetWin.webContents.send('load-note-content', { id, content });
-      //console.log("works");
+      const targetWin = activeWindows.get(payload.old.id);
+      if (targetWin) targetWin.webContents.send('load-note-content', { id, content, x_pos, y_pos });
     })
     .subscribe();
+}
+
+async function moveSupabase(id, x_pos, y_pos) {
+  try {
+    console.log("he");
+    const { data: result, error } = await supabase
+      .from('notes')
+      .update({ x_pos: x_pos, y_pos: y_pos })
+      .eq('id', id);
+
+    if (error) throw error;
+    return { success: true, result };
+  } catch (err) {
+    console.error('Failed to update note:', err);
+    return { success: false, error: err.message };
+  }
 }
 
 async function callSupabase() {
@@ -113,9 +134,22 @@ ipcMain.handle('close-and-delete-note', async (_, id) => {
   await supabase.from('notes').delete().eq('id', id);
 }); // currently can only delete notes individually
 
-ipcMain.handle('update-text', async (_, id, text) => {
-  await supabase.from('notes').update([{content: text}]).eq('id', id);
+ipcMain.handle('update-note-content', async (event, data) => {
+  try {
+    console.log("here");
+    const { data: result, error } = await supabase
+      .from('notes')
+      .update({ content: data.content })
+      .eq('id', data.id);
+
+    if (error) throw error;
+    return { success: true, result };
+  } catch (err) {
+    console.error('Failed to update note:', err);
+    return { success: false, error: err.message };
+  }
 });
+
 
 app.whenReady().then(() => { 
     initSupabaseRealtime(); 
