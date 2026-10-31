@@ -37,7 +37,7 @@ function createWindow() {
 
 let activeWindows = new Map();
 
-function createNote(id, content, x, y) {
+function createNote(id, content, x, y, colour) {
   if (activeWindows.has(id)) return; // Prevent duplicate windows for the same record
 
   const win = new BrowserWindow({
@@ -48,7 +48,7 @@ function createNote(id, content, x, y) {
     frame: false,
     skipTaskbar: true,
     alwaysOnTop: true,
-    resizable: true,
+    resizable: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -57,16 +57,19 @@ function createNote(id, content, x, y) {
   });
   win.loadFile('note.html');
   activeWindows.set(id, win);
+  win.setAlwaysOnTop(true, 'screen-saver');
 
   // send content data once webContents finish loading
   win.webContents.on('did-finish-load', () => {
-    const [x_pos, y_pos] = win.getPosition();
-    win.webContents.send('load-note-content', { id, content });
+    win.webContents.send('load-note-content', { id, content, colour });
   });
   win.on('moved', () => {
     const [x_pos, y_pos] = win.getPosition();
     moveSupabase(id, x_pos, y_pos);
-    //win.webContents.send('load-note-content', { id, content, x_pos, y_pos});
+  });
+
+  win.on('resize', () => { // bug where moving the window slightly increases the window size
+    win.setContentSize(250, 250); // set it back to 250x250
   });
 
   win.on('closed', () => {
@@ -78,20 +81,20 @@ function initSupabaseRealtime() {
   supabase
     .channel('schema-db-changes')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notes' }, (payload) => {
-      const { id, content, x_pos, y_pos } = payload.new;
-      createNote(id, content, x_pos, y_pos);
+      const { id, content, x_pos, y_pos, colour } = payload.new;
+      createNote(id, content, x_pos, y_pos, colour);
     })
     .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'notes' }, (payload) => {
       const targetWin = activeWindows.get(payload.old.id);
       if (targetWin) targetWin.close();
     })
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'notes' }, (payload) => {
-      const {id, content, x_pos, y_pos } = payload.new;
+      const {id, content, x_pos, y_pos, colour } = payload.new;
       const targetWin = activeWindows.get(payload.old.id);
       if (targetWin) {
-        targetWin.webContents.send('load-note-content', { id, content, x_pos, y_pos });
-        console.log("movcing");
+        targetWin.webContents.send('load-note-content', { id, content, colour });
         targetWin.setPosition(x_pos, y_pos);
+        targetWin.setSize(250, 250);
       }
     })
     .subscribe();
@@ -99,7 +102,6 @@ function initSupabaseRealtime() {
 
 async function moveSupabase(id, x_pos, y_pos) {
   try {
-    console.log("he");
     const { data: result, error } = await supabase
       .from('notes')
       .update({ x_pos: x_pos, y_pos: y_pos })
@@ -114,24 +116,22 @@ async function moveSupabase(id, x_pos, y_pos) {
 }
 
 async function callSupabase() {
-  console.log(activeWindows);
   const { data: rows, error } = await supabase
     .from('notes')
     .select('*');
 
   if (rows) {
     for (const row of rows) {
-      createNote(row.id, row.content, row.x_pos, row.y_pos); // spawn each note on local
-      console.log(row.id);
+      createNote(row.id, row.content, row.x_pos, row.y_pos, row.colour); // spawn each note on local
     }
   }
 }
 
 // Bridge note user interface request to write back to Supabase
-ipcMain.handle('create-new-note', async (_, text) => {
+ipcMain.handle('create-new-note', async (_, data) => {
   const randomX = Math.floor(Math.random() * 500) + 100;
   const randomY = Math.floor(Math.random() * 500) + 100;
-  await supabase.from('notes').insert([{ content: text, x_pos: randomX, y_pos: randomY }]);
+  await supabase.from('notes').insert([{ content: data.content, x_pos: randomX, y_pos: randomY, colour: data.colour}]);
 });
 
 ipcMain.handle('close-and-delete-note', async (_, id) => {
@@ -140,7 +140,6 @@ ipcMain.handle('close-and-delete-note', async (_, id) => {
 
 ipcMain.handle('update-note-content', async (event, data) => {
   try {
-    console.log("here");
     const { data: result, error } = await supabase
       .from('notes')
       .update({ content: data.content })
@@ -155,53 +154,82 @@ ipcMain.handle('update-note-content', async (event, data) => {
 });
 
 
-app.whenReady().then(() => { 
-    initSupabaseRealtime(); 
-    createWindow(); 
-    callSupabase();
-    ipcMain.on('execute-custom-command', async (event, command) => { // custom commands from renderer.js
-        console.log(`Command: ${command}`); 
+app.whenReady().then(() => {
+  initSupabaseRealtime();
+  createWindow();
+  callSupabase();
 
-        try {
-          // commands from terminal
-            if (command === 'help') { 
-                console.log('add command list here'); 
-            } else if (command === 'create') { // make new note add amounts, colour, text customization?
-                const randomX = Math.floor(Math.random() * 500) + 100; 
-                const randomY = Math.floor(Math.random() * 500) + 100; 
-                
-                const noteText = typeof text !== 'undefined' ? text : `New note`;
+  ipcMain.on('execute-custom-command', async (event, command) => {
+    console.log(`Command received: ${command}`);
 
-                const { data, error } = await supabase
-                    .from('notes')
-                    .insert([{ content: noteText, x_pos: randomX, y_pos: randomY }]);
+    // string to args
+    const args = command.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
+    if (args.length === 0) return;
 
-                if (error) throw error; // catch Supabase API errors
-                console.log('Note created successfully:', data);
-            }
-            else if (command === 'grab') { // pulls all rows from notes
-              callSupabase();
-            } 
-            else if (command === 'hide') {
-              console.log(activeWindows);
-              const allWindows = BrowserWindow.getAllWindows();
-              allWindows.forEach((win) => {
-                // Check if the current window is not the one you want to keep
-                if (win !== mainWindow) {
-                  win.close();
-                }
-              });
-            } else { 
-                console.log(`Unknown command: ${command}`); 
-            } 
-        } catch (error) {
-            // This catches both the ReferenceError (missing text) and network/database errors
-            console.error('An error occurred inside the ipcMain handler:', error);
-            
-            // Send the error back to the frontend UI
-            event.reply('execute-custom-command-error', error.message);
+    const baseCommand = args[0].toLowerCase(); // create, grab, hide
+
+    // change this so instead of -w -c it works as -wc
+    const getFlagValue = (flag) => {
+      const index = args.indexOf(flag);
+      if (index !== -1 && index + 1 < args.length) {
+        return args[index + 1].replace(/^"|"$/g, ''); 
+      }
+      return null;
+    };
+
+    try {
+      switch (baseCommand) {
+        case 'help':
+          console.log("add help command here");
+          break;
+
+        case 'create': {
+          const randomX = Math.floor(Math.random() * 500) + 100;
+          const randomY = Math.floor(Math.random() * 500) + 100;
+
+          // Check flags or fall back to defaults
+          const noteText = getFlagValue('-w') || 'New note';
+          const colour = getFlagValue('-c') || 'yellow';
+
+          const { data, error } = await supabase
+            .from('notes')
+            .insert([{ content: noteText, x_pos: randomX, y_pos: randomY, colour: colour }]);
+
+          if (error) throw error;
+
+          console.log('Note created successfully:', data);
+          event.reply('execute-custom-command-success', 'Note created successfully.');
+          break;
         }
-    }); 
+
+        case 'grab':
+          // Pulls all rows from notes
+          callSupabase();
+          event.reply('execute-custom-command-success', 'Fetched latest notes.');
+          break;
+
+        case 'hide': {
+          const allWindows = BrowserWindow.getAllWindows();
+          allWindows.forEach((win) => {
+            // Safely close note windows
+            if (typeof mainWindow !== 'undefined' && win !== mainWindow) {
+              win.close();
+            }
+          });
+          event.reply('execute-custom-command-success', 'Hidden non-main windows.');
+          break;
+        }
+
+        default:
+          console.log(`Unknown command: ${baseCommand}`);
+          event.reply('execute-custom-command-error', `Unknown command: ${baseCommand}`);
+          break;
+      }
+    } catch (error) {
+      console.error('An error occurred inside the ipcMain handler:', error);
+      event.reply('execute-custom-command-error', error.message);
+    }
+  });
 });
 
 

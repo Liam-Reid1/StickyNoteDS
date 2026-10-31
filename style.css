@@ -1,0 +1,182 @@
+:root,
+:root.yellow {
+    --light: #fef68a;
+    --dark: #eab308;
+    --darker: #a16207;
+}
+:root.blue {
+    --light: #a9edf1;
+    --dark: #0bcfd9;
+    --darker: #07838a;
+}
+:root.pink {
+    --light:#eb82c3;
+    --dark: #ff32b2;
+    --darker: #bd0b79;
+}
+:root.orange {
+    --light:#ffa930;
+    --dark: #a16207;
+    --darker: #754706;
+}
+:root.green {
+    --light: #74ed4b;
+    --dark: #3abd0e;
+    --darker: #228700;
+}
+
+body {
+    background: var(--light);
+    font-family: sans-serif;
+    margin: 0;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    box-sizing: border-box;
+    border: 2px solid var(--dark);
+    border-radius: 4px;
+    -webkit-app-region: drag;
+    cursor: grab;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    cursor: grab;
+    margin-bottom: 8px;
+}
+
+.close-btn {
+    cursor: pointer;
+    font-weight: bold;
+    background: none;
+    border: none;
+    color: var(--darker);
+    -webkit-app-region: no-drag;
+    z-index: 11;
+}
+
+textarea {
+    flex: 1;
+    background: transparent;
+    border: none; resize: none;
+    font-size: 16px;
+    outline: none;
+    -webkit-app-region: no-drag;
+}
+
+.footer {
+    display: flex;
+    justify-content: flex-end;
+}
+.add-colour {
+    width: 20px;
+    height: 20px;
+    border: none;
+    display: none;
+    opacity: 0;
+    margin: 4px 20px;
+    margin-left: 0;
+    border: 2px solid var(--dark);
+    border-radius: 2px;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+}
+.add-colour.show {
+  display: inline-block;
+  animation: popIn 0.15s ease forwards;
+}
+#yellow {
+    background: #fef68a;
+}
+#blue {
+    background: #a9edf1;
+}
+#pink {
+    background: #eb82c3;;
+}
+#orange {
+    background: #ffa930;
+}
+#green {
+    background: #74ed4b;
+}
+.add-btn {
+    background: var(--dark);
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    -webkit-app-region: no-drag;
+    z-index: 11;
+}
+
+.overlay {
+    /* Position the element to cover the entire viewport */
+    display: none;
+    position: fixed;
+    top: 15vh;
+    left: 0;
+    width: 100vw;
+    height: 85vh;
+    z-index: 10; /* Ensures it sits on top of all other elements */
+    cursor: default;
+    /* Visual styles */
+    background-color: rgba(0, 0, 0, 0.25);
+    border: none;
+    resize: none;
+    font-size: 16px;
+    outline: none;
+    transform-origin: bottom;
+
+    /* Electron frameless window behaviors */
+    -webkit-app-region: no-drag; /* Prevents dragging when clicking the overlay */
+    box-sizing: border-box; 
+}
+.overlay.show {
+  display: inline-block;
+}
+
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  90% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes popOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: scaleY(0);
+    }
+    100% {
+        opacity: 1;
+        transform: scaleY(1.0);
+    }
+}
