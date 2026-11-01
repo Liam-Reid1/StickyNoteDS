@@ -142,7 +142,7 @@ ipcMain.handle('update-note-content', async (event, data) => {
   try {
     const { data: result, error } = await supabase
       .from('notes')
-      .update({ content: data.content })
+      .update({ content: data.content, colour: data.colour })
       .eq('id', data.id);
 
     if (error) throw error;

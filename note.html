@@ -2,6 +2,7 @@
 <html>
 <head>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
   <div class="header">
@@ -9,13 +10,43 @@
   </div>
   <textarea id="noteArea" placeholder="Type something..."></textarea>
   <div class="footer">
-    <button class="add-colour" id="green"></button>
-    <button class="add-colour" id="blue"></button>
-    <button class="add-colour" id="pink"></button>
-    <button class="add-colour" id="yellow"></button>
-    <button class="add-btn" id="addBtn">+</button>
+    <button class="option-btn" id="optionBtn" title="Options"><i class="fa fa-cog"></i></button>
+    <button class="add-colour colour-btn" id="green"></button>
+    <button class="add-colour colour-btn" id="blue"></button>
+    <button class="add-colour colour-btn" id="pink"></button>
+    <button class="add-colour colour-btn" id="yellow"></button>
+    <button class="option-btn" id="addBtn">+</button>
   </div>
-  <!--<div class="overlay" id="overlayWindow"></div>-->
+  <div class="overlay" id="overlayWindow">
+    <div class="overlay-option" id="paintOverlay">
+      <button class="option-btn overlay-button" id="paintBtn" title="Change Colour"><i class="fa fa-paint-brush" aria-hidden="true"></i></button>
+      <button class="paint-colour colour-btn" id="green"></button>
+      <button class="paint-colour colour-btn" id="blue"></button>
+      <button class="paint-colour colour-btn" id="pink"></button>
+      <button class="paint-colour colour-btn" id="yellow"></button>
+    </div>
+    <div class="overlay-option" id="textOverlay">
+      <button class="option-btn overlay-button" id="textBtn" title="Create Text Note"><i class="fa fa-font" aria-hidden="true"></i></button>
+      <button class="text-colour colour-btn" id="green"></button>
+      <button class="text-colour colour-btn" id="blue"></button>
+      <button class="text-colour colour-btn" id="pink"></button>
+      <button class="text-colour colour-btn" id="yellow"></button>
+    </div>
+    <div class="overlay-option" id="drawOverlay">
+      <button class="option-btn overlay-button" id="drawBtn" title="Create Draw Note"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+      <button class="draw-colour colour-btn" id="green"></button>
+      <button class="draw-colour colour-btn" id="blue"></button>
+      <button class="draw-colour colour-btn" id="pink"></button>
+      <button class="draw-colour colour-btn" id="yellow"></button>
+    </div>
+    <div class="overlay-option" id="imageOverlay">
+      <button class="option-btn overlay-button" id="imageBtn" title="Create Image Note"><i class="fa fa-picture-o" aria-hidden="true"></i></button>
+      <button class="image-colour colour-btn" id="green"></button>
+      <button class="image-colour colour-btn" id="blue"></button>
+      <button class="image-colour colour-btn" id="pink"></button>
+      <button class="image-colour colour-btn" id="yellow"></button>
+    </div>
+  </div>
   <script src="notelogic.js"></script>
 </body>
 </html>
