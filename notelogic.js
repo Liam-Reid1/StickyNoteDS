@@ -115,6 +115,7 @@ document.getElementById('optionBtn').addEventListener('click', (e) => {
 });
 
 function closeOverlay() {
+  if (!overlay.classList.contains('show')) return; // Return if already closed
   overlay.style.animation = "fadeOut 0.3s ease forwards"; 
   document.getElementById('optionBtn').classList.add('animate');
     setTimeout(() => { 

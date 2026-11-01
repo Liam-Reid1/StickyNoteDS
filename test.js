@@ -43,7 +43,7 @@ function createNote(id, content, x, y, colour) {
 }
 
 app.whenReady().then(() => {
-  createNote("main", "testing note", 250, 250, "blue");
+  createNote("main", "testing note", 250, 250, "purple");
 });
 
 

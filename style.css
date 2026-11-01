@@ -1,28 +1,52 @@
-:root,
-:root.yellow {
+:root {
     --light: #fef68a;
     --dark: #eab308;
     --darker: #a16207;
 }
-:root.blue {
-    --light: #a9edf1;
-    --dark: #0bcfd9;
-    --darker: #07838a;
-}
-:root.pink {
-    --light:#eb82c3;
-    --dark: #ff32b2;
-    --darker: #bd0b79;
+:root.red {
+    --light: #ff6575;
+    --dark: #e33445;
+    --darker: #91000e;
 }
 :root.orange {
     --light:#ffa930;
     --dark: #a16207;
     --darker: #754706;
 }
+:root.yellow {
+    --light: #fef68a;
+    --dark: #eab308;
+    --darker: #a16207;
+}
 :root.green {
     --light: #74ed4b;
     --dark: #3abd0e;
     --darker: #228700;
+}
+:root.cyan {
+    --light: #a9edf1;
+    --dark: #0bcfd9;
+    --darker: #07838a;
+}
+:root.blue {
+    --light: #8ca0ff;
+    --dark: #576ede;
+    --darker: #2940b4;
+}
+:root.purple {
+    --light: #b485bc;
+    --dark: #b04ac2;
+    --darker: #841897;
+}
+:root.pink {
+    --light:#eb82c3;
+    --dark: #ff32b2;
+    --darker: #bd0b79;
+}
+:root.white {
+    --light: #f5f6f8;
+    --dark: #969696;
+    --darker: #6a6a6a;
 }
 
 body {
@@ -56,6 +80,13 @@ body {
     color: var(--darker);
     -webkit-app-region: no-drag;
     z-index: 11;
+    transition: transform 0.3s ease;
+}
+.close-btn:hover {
+    transform: scale(1.1);
+}
+.close-btn:active {
+    transform: scale(0.9);
 }
 
 textarea {
@@ -71,38 +102,66 @@ textarea {
     display: flex;
     justify-content: center;
 }
+
 .colour-btn {
     width: 20px;
     height: 20px;
     border: none;
     display: none;
     opacity: 0;
-    margin: 4px 18px;
-    margin-left: 0;
     border: 2px solid var(--dark);
     border-radius: 2px;
     cursor: pointer;
     -webkit-app-region: no-drag;
+    animation: popIn 0.15s ease forwards;
 }
+
+.colour-wrapper {
+    width: 20px;
+    height: 20px;
+    margin: 4px 18px;
+    margin-left: 0;
+    transition: transform 0.3s ease;
+}
+.colour-wrapper:hover {
+    transform: scale(1.1);
+}
+.colour-wrapper:active {
+    transform: scale(0.9);
+}
+
 .show {
   display: inline-block;
-  animation: popIn 0.15s ease forwards;
 }
-#yellow {
-    background: #fef68a;
-}
-#blue {
-    background: #a9edf1;
-}
-#pink {
-    background: #eb82c3;;
+
+#red {
+    background: #ff6575;;
 }
 #orange {
     background: #ffa930;
 }
+#yellow {
+    background: #fef68a;
+}
 #green {
     background: #74ed4b;
 }
+#cyan {
+    background: #a9edf1;
+}
+#blue {
+    background: #8ca0ff;
+}
+#purple {
+    background: #b485bc;
+}
+#pink {
+    background: #eb82c3;;
+}
+#white {
+    background: #f5f6f8;
+}
+
 .option-btn {
     margin-right: auto;
     background: var(--dark);
@@ -114,16 +173,30 @@ textarea {
     color: white;
     font-weight: bold;
     -webkit-app-region: no-drag;
+    transition: transform 0.3s ease;
 }
+.option-btn:hover {
+    transform: scale(1.1);
+}
+.option-btn:active {
+    transform: scale(0.9);
+}
+
 .overlay-button {
     margin-right: 18px;
 }
+
 #optionBtn {
     z-index: 11;
 }
+#optionBtn.animate {
+    animation: spin 0.3s ease forwards;
+}
+
 #addBtn {
     margin-right: 0;
 }
+
 .overlay {
     /* Position the element to cover the entire viewport */
     display: none;
@@ -151,13 +224,11 @@ textarea {
 .overlay.show {
   display: inline-block;
 }
+
 .overlay-option {
     margin-bottom: 12px;
     height: 28px;
     display: flex;
-}
-#optionBtn.animate {
-    animation: spin 0.3s ease forwards;
 }
 
 @keyframes popIn {
