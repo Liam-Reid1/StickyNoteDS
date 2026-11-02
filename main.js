@@ -37,7 +37,7 @@ function createWindow() {
 
 let activeWindows = new Map();
 
-function createNote(id, content, x, y, colour, type) {
+function createNote(id, content, x, y, colour, type, canvas_json) {
   if (activeWindows.has(id)) return; // Prevent duplicate windows for the same record
 
   const win = new BrowserWindow({
@@ -61,7 +61,7 @@ function createNote(id, content, x, y, colour, type) {
 
   // send content data once webContents finish loading
   win.webContents.on('did-finish-load', () => {
-    win.webContents.send('load-note-content', { id, content, colour, type });
+    win.webContents.send('load-note-content', { id, content, colour, type, canvas_json });
   });
   win.on('moved', () => {
     const [x_pos, y_pos] = win.getPosition();
@@ -81,18 +81,18 @@ function initSupabaseRealtime() {
   supabase
     .channel('schema-db-changes')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notes' }, (payload) => {
-      const { id, content, x_pos, y_pos, colour, type } = payload.new;
-      createNote(id, content, x_pos, y_pos, colour, type);
+      const { id, content, x_pos, y_pos, colour, type, canvas_json } = payload.new;
+      createNote(id, content, x_pos, y_pos, colour, type, canvas_json);
     })
     .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'notes' }, (payload) => {
       const targetWin = activeWindows.get(payload.old.id);
       if (targetWin) targetWin.close();
     })
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'notes' }, (payload) => {
-      const {id, content, x_pos, y_pos, colour, type } = payload.new;
+      const {id, content, x_pos, y_pos, colour, type, canvas_json } = payload.new;
       const targetWin = activeWindows.get(payload.old.id);
       if (targetWin) {
-        targetWin.webContents.send('load-note-content', { id, content, colour, type });
+        targetWin.webContents.send('load-note-content', { id, content, colour, type, canvas_json });
         targetWin.setPosition(x_pos, y_pos);
         targetWin.setSize(250, 250);
       }
@@ -122,7 +122,7 @@ async function callSupabase() {
 
   if (rows) {
     for (const row of rows) {
-      createNote(row.id, row.content, row.x_pos, row.y_pos, row.colour, row.type); // spawn each note on local
+      createNote(row.id, row.content, row.x_pos, row.y_pos, row.colour, row.type, row.canvas_json); // spawn each note on local
     }
   }
 }
@@ -131,7 +131,7 @@ async function callSupabase() {
 ipcMain.handle('create-new-note', async (_, data) => {
   const randomX = Math.floor(Math.random() * 500) + 100;
   const randomY = Math.floor(Math.random() * 500) + 100;
-  await supabase.from('notes').insert([{ content: data.content, x_pos: randomX, y_pos: randomY, colour: data.colour, type: data.type}]);
+  await supabase.from('notes').insert([{ content: data.content, x_pos: randomX, y_pos: randomY, colour: data.colour, type: data.type, canvas_json: null }]);
 });
 
 ipcMain.handle('close-and-delete-note', async (_, id) => {
@@ -140,9 +140,15 @@ ipcMain.handle('close-and-delete-note', async (_, id) => {
 
 ipcMain.handle('update-note-content', async (event, data) => {
   try {
+    const updateData = { colour: data.colour};
+    switch (data.type) {
+      case 1: updateData.content = data.content; break;
+      case 2: updateData.canvas_json = data.canvas_json; break;
+      default: throw new Error(`Invalid data type: ${data.type}`);
+    }
     const { data: result, error } = await supabase
       .from('notes')
-      .update({ content: data.content, colour: data.colour })
+      .update(updateData)
       .eq('id', data.id);
 
     if (error) throw error;
@@ -193,7 +199,7 @@ app.whenReady().then(() => {
 
           const { data, error } = await supabase
             .from('notes')
-            .insert([{ content: noteText, x_pos: randomX, y_pos: randomY, colour: colour, type: 1 }]);
+            .insert([{ content: noteText, x_pos: randomX, y_pos: randomY, colour: colour, type: 1, canvas_json: null }]);
 
           if (error) throw error;
 

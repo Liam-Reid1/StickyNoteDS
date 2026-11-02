@@ -61,14 +61,14 @@ body {
     border: 2px solid var(--dark);
     border-radius: 4px;
     -webkit-app-region: drag;
-    cursor: grab;
+    cursor: default;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     -webkit-app-region: drag;
-    cursor: grab;
+    cursor: default;
     margin-bottom: 8px;
 }
 

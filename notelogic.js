@@ -2,6 +2,7 @@ let currentNoteId = null;
 let clickTimer = null;
 const DELAY = 250;
 let colour = "yellow";
+let type = 1;
 
 const colourButtons = document.querySelectorAll('.colour-btn');
 const addColour = document.querySelectorAll('.add-colour');
@@ -17,12 +18,18 @@ window.electronAPI.onLoadContent((data) => {
   document.documentElement.classList.add(colour);
   const noteArea = document.getElementById('noteArea');
   const canvasContainer = document.getElementById('canvasContainer');
+  type = data.type;
   if (data.type == 1) {
     noteArea.style.display = "flex";
     noteArea.value = data.content;
   }
   else if (data.type == 2) {
     canvasContainer.style.display = "flex";
+    document.documentElement.className = "";
+    document.documentElement.classList.add("yellow");
+    canvas.loadFromJSON(data.canvas_json, () => {
+      canvas.renderAll();
+    });
   }
 });
 
@@ -32,7 +39,7 @@ document.getElementById('closeBtn').addEventListener('click', () => {
 
 document.getElementById('noteArea').addEventListener('change', () => {
   const val = document.getElementById('noteArea').value;
-  if (currentNoteId) window.electronAPI.onUpdateContent({id: currentNoteId, content: val, colour: colour});
+  if (currentNoteId) window.electronAPI.onUpdateContent({id: currentNoteId, content: val, colour: colour, type: 1});
 });
 
 // Current Note Functions
@@ -46,14 +53,20 @@ document.getElementById('addBtn').addEventListener('click', (e) => { // fix this
       // Start a timer for a single click
       clickTimer = setTimeout(() => {
           clickTimer = null;
-          createTextNote(); // single click
+          switch (type) { // single click
+            case 1: createTextNote(); break;
+            case 2: createDrawNote(); break;
+          }
       }, DELAY);
   }
 });
 
 addColour.forEach(button => { // fix this to be variable depending on the base note
   button.addEventListener('click', (e) => {
-    createTextNote(e.target.id);
+    switch (type) {
+      case 1: createTextNote(e.target.id); break;
+      case 2: createDrawNote(e.target.id); break;
+    }
   });
 });
 
@@ -111,7 +124,7 @@ drawColour.forEach(button => { // creates text note with defined colour
 
 function createDrawNote(newColour = colour) { // use base colour if none given
   //const val = document.getElementById('noteArea').value;
-  window.electronAPI.onCreateNote({content: '', colour: newColour, type: 2});
+  window.electronAPI.onCreateNote({content: '', colour: newColour, type: 2, canvas_json: null});
   hideColourButtons();
   closeOverlay();
 }
@@ -131,7 +144,8 @@ paintColour.forEach(button => { // creates text note with defined colour
 
 function updateNoteColour(newColour) {
   const val = document.getElementById('noteArea').value;
-  if (currentNoteId) window.electronAPI.onUpdateContent({id: currentNoteId, content: val || '', colour: newColour});
+  canvasJsonData = canvas.toJSON(); 
+  if (currentNoteId) window.electronAPI.onUpdateContent({id: currentNoteId, content: val, colour: newColour, type: type, canvas_json: canvasJsonData});
   closeOverlay();
 }
 

@@ -6,6 +6,7 @@ canvas.freeDrawingBrush.color = '#000000';
 canvas.freeDrawingBrush.strokeLineCap = 'round';
 
 let allStrokes = [];
+let canvasJsonData;
 
 canvas.on('path:created', (e) => {
     const path = e.path;
@@ -20,11 +21,14 @@ canvas.on('path:created', (e) => {
     allStrokes.push(currentStroke);
     
     // send update now
-    const canvasJsonData = canvas.toJSON(); 
-    console.log(canvasJsonData);
+    canvasJsonData = canvas.toJSON(); 
+    if (currentNoteId) window.electronAPI.onUpdateContent({id: currentNoteId, colour: colour, type: 2, canvas_json: canvasJsonData});
 });
+
 
 document.getElementById('clearBtn').addEventListener('click', () => {
     canvas.clear();
     allStrokes = [];
+    canvasJsonData = canvas.toJSON(); 
+    if (currentNoteId) window.electronAPI.onUpdateContent({id: currentNoteId, colour: colour, type: 2, canvas_json: canvasJsonData});
 });

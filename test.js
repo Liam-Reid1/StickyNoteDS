@@ -11,10 +11,10 @@ function createNote(id, content, x, y, colour, type) {
     height: 250,
     x: x || 200,
     y: y || 200,
-    frame: false,
+    frame: true,
     skipTaskbar: true,
     alwaysOnTop: true,
-    resizable: false,
+    resizable: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
