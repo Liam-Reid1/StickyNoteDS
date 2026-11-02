@@ -3,7 +3,7 @@ const path = require('path');
 
 let activeWindows = new Map();
 
-function createNote(id, content, x, y, colour) {
+function createNote(id, content, x, y, colour, type) {
   if (activeWindows.has(id)) return; // Prevent duplicate windows for the same record
 
   const win = new BrowserWindow({
@@ -27,7 +27,7 @@ function createNote(id, content, x, y, colour) {
 
   // send content data once webContents finish loading
   win.webContents.on('did-finish-load', () => {
-    win.webContents.send('load-note-content', { id, content, colour });
+    win.webContents.send('load-note-content', { id, content, colour, type });
   });
   win.on('moved', () => {
     const [x_pos, y_pos] = win.getPosition();
@@ -43,7 +43,7 @@ function createNote(id, content, x, y, colour) {
 }
 
 app.whenReady().then(() => {
-  createNote("main", "testing note", 250, 250, "purple");
+  createNote("main", "testing note", 250, 250, "purple", 2);
 });
 
 

@@ -37,7 +37,7 @@ function createWindow() {
 
 let activeWindows = new Map();
 
-function createNote(id, content, x, y, colour) {
+function createNote(id, content, x, y, colour, type) {
   if (activeWindows.has(id)) return; // Prevent duplicate windows for the same record
 
   const win = new BrowserWindow({
@@ -61,7 +61,7 @@ function createNote(id, content, x, y, colour) {
 
   // send content data once webContents finish loading
   win.webContents.on('did-finish-load', () => {
-    win.webContents.send('load-note-content', { id, content, colour });
+    win.webContents.send('load-note-content', { id, content, colour, type });
   });
   win.on('moved', () => {
     const [x_pos, y_pos] = win.getPosition();
@@ -81,18 +81,18 @@ function initSupabaseRealtime() {
   supabase
     .channel('schema-db-changes')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notes' }, (payload) => {
-      const { id, content, x_pos, y_pos, colour } = payload.new;
-      createNote(id, content, x_pos, y_pos, colour);
+      const { id, content, x_pos, y_pos, colour, type } = payload.new;
+      createNote(id, content, x_pos, y_pos, colour, type);
     })
     .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'notes' }, (payload) => {
       const targetWin = activeWindows.get(payload.old.id);
       if (targetWin) targetWin.close();
     })
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'notes' }, (payload) => {
-      const {id, content, x_pos, y_pos, colour } = payload.new;
+      const {id, content, x_pos, y_pos, colour, type } = payload.new;
       const targetWin = activeWindows.get(payload.old.id);
       if (targetWin) {
-        targetWin.webContents.send('load-note-content', { id, content, colour });
+        targetWin.webContents.send('load-note-content', { id, content, colour, type });
         targetWin.setPosition(x_pos, y_pos);
         targetWin.setSize(250, 250);
       }
@@ -122,7 +122,7 @@ async function callSupabase() {
 
   if (rows) {
     for (const row of rows) {
-      createNote(row.id, row.content, row.x_pos, row.y_pos, row.colour); // spawn each note on local
+      createNote(row.id, row.content, row.x_pos, row.y_pos, row.colour, row.type); // spawn each note on local
     }
   }
 }
@@ -131,7 +131,7 @@ async function callSupabase() {
 ipcMain.handle('create-new-note', async (_, data) => {
   const randomX = Math.floor(Math.random() * 500) + 100;
   const randomY = Math.floor(Math.random() * 500) + 100;
-  await supabase.from('notes').insert([{ content: data.content, x_pos: randomX, y_pos: randomY, colour: data.colour}]);
+  await supabase.from('notes').insert([{ content: data.content, x_pos: randomX, y_pos: randomY, colour: data.colour, type: data.type}]);
 });
 
 ipcMain.handle('close-and-delete-note', async (_, id) => {
@@ -193,7 +193,7 @@ app.whenReady().then(() => {
 
           const { data, error } = await supabase
             .from('notes')
-            .insert([{ content: noteText, x_pos: randomX, y_pos: randomY, colour: colour }]);
+            .insert([{ content: noteText, x_pos: randomX, y_pos: randomY, colour: colour, type: 1 }]);
 
           if (error) throw error;
 

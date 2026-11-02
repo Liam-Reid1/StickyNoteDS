@@ -7,8 +7,12 @@
 <body>
   <div class="header">
     <button class="close-btn" id="closeBtn">[X]</button>
+    <button class="clear-btn" id="clearBtn"><i class="fa fa-eraser" aria-hidden="true"></i></button>
   </div>
-  <textarea id="noteArea" placeholder="Type something..."></textarea>
+    <div id="canvasContainer">
+      <canvas id="drawCanvas"></canvas>
+    </div>
+    <textarea id="noteArea" placeholder="Type something..."></textarea>
   <div class="footer">
     <button class="option-btn" id="optionBtn" title="Options"><i class="fa fa-cog"></i></button>
     <span class="colour-wrapper"><button class="add-colour colour-btn" id="green"></button></span>
@@ -47,6 +51,8 @@
       <span class="colour-wrapper"><button class="image-colour colour-btn" id="yellow"></button></span>
     </div>
   </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/2.3.6/fabric.min.js"></script>
   <script src="notelogic.js"></script>
+  <script src="drawinglogic.js"></script>
 </body>
 </html>
