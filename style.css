@@ -92,6 +92,7 @@ body {
 .clear-btn {
     background: var(--dark);
     border: none;
+    display: none;
     border-radius: 25%;
     width: 32px;
     height: 20px;

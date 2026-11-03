@@ -24,9 +24,8 @@ window.electronAPI.onLoadContent((data) => {
     noteArea.value = data.content;
   }
   else if (data.type == 2) {
+    document.getElementById('clearBtn').style.display = "inline-block";
     canvasContainer.style.display = "flex";
-    document.documentElement.className = "";
-    document.documentElement.classList.add("yellow");
     canvas.loadFromJSON(data.canvas_json, () => {
       canvas.renderAll();
     });
