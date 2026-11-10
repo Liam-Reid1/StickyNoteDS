@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, screen } = require('electron');
 const path = require('path');
 const os = require('os');
 const { createClient } = require('@supabase/supabase-js');
@@ -18,22 +18,46 @@ const supabase = createClient(
 let mainWindow;
 
 function createWindow() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  const windowWidth = 200;
+  const windowHeight = 300;
+
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: windowWidth,
+    height: windowHeight,
+    x: 0,
+    y: height - windowHeight,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false, // Keep false so the user can't manually drag resize it
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'), // preload script for security
-      contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      contextIsolation: true
     }
   });
 
-  mainWindow.loadFile('index.html');
+  mainWindow.loadFile('index.html'); // Load your main file directly
 
-  mainWindow.on('closed', () => { // close terminal, close all (does not delete notes)
-    if (process.platform !== 'darwin') app.quit();
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+    mainWindow.setIgnoreMouseEvents(true, { forward: true });
   });
 }
+
+ipcMain.on('disable-click-through', () => {
+  mainWindow.setIgnoreMouseEvents(false);
+});
+
+ipcMain.on('enable-click-through', () => {
+  mainWindow.setIgnoreMouseEvents(true, { forward: true });
+});
+
+ipcMain.on('close-terminal', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
 
 let activeWindows = new Map();
 

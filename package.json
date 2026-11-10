@@ -5,13 +5,15 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "electron test.js"
+    "test": "electron test.js",
+    "terminal": "electron terminaltest.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",
+    "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "^6.0.0",
     "dotenv": "^18.0.7",
     "electron": "^44.9.2",
