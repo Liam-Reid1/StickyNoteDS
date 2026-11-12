@@ -1,7 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    sendTerminalCommand: (command) => ipcRenderer.send('execute-custom-command', command), // renderer to main
+    sendTerminalCommand: (data) => ipcRenderer.send('execute-custom-command', data), // renderer to main
     enableClickThrough: () => ipcRenderer.send('enable-click-through'),
     disableClickThrough: () => ipcRenderer.send('disable-click-through'),
     onCloseTerminal: () => ipcRenderer.send('close-terminal'),

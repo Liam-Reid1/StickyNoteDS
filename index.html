@@ -1,106 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="terminalstyle.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="./node_modules/xterm/css/xterm.css" />
-    <style>
-
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-      height: 100vh;
-      background: transparent;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    #app-container {
-        width: 60px;
-        height: 60px;
-        background: #1e1e1e;
-        border-radius: 50%;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1), height 0.3s cubic-bezier(0.25, 1, 0.5, 1), border-radius 0.3s ease;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        border: 2px solid #d2d2d2;
-    }
-
-    #app-container.expanded {
-        width: 100vw;
-        height: 90vh;
-        border-radius: 12px;
-        background: #1e1e1e;
-    }
-
-    .open-btn {
-        display: flex;
-        margin: auto;
-        cursor: pointer;
-        justify-content: center;
-        align-items: center;
-        color: #d2d2d2;
-        width: 100%;
-        height: 100%;
-        transition: transform 0.3s ease;
-    }
-    .open-btn:hover {
-        transform: scale(1.1);
-    }
-
-    .main-content {
-        display: none;
-        padding: 20px;
-    }
-
-    #app-container.expanded .open-btn {
-        display: none;
-    }
-
-    #terminal {
-        display: block;
-        padding: 10px;
-        overflow-wrap: break-word;
-    }
-
-    #header {
-        display: flex;
-        justify-content: flex-end;
-        cursor: default;
-        margin: 8px;
-    }
-    .terminal-btn {
-        cursor: pointer;
-        font-weight: bold;
-        background: none;
-        border: none;
-        color: #d2d2d2;
-        z-index: 11;
-        transition: transform 0.3s ease;
-    }
-.terminal-btn:hover {
-    transform: scale(1.1);
-}
-.terminal-btn:active {
-    transform: scale(0.9);
-}
-    .terminal-container {
-        width: 200px;
-        height: 300px;
-        box-sizing: border-box;
-        overflow: hidden;
-        overflow-wrap: break-word;
-    }
-
-    .xterm .xterm-viewport::-webkit-scrollbar {
-        display: none;
-    }
-
-    </style>
 </head>
 <body>
     <div id="app-container">
@@ -110,7 +13,26 @@
                 <button class="terminal-btn" id="minimizeBtn">[ _ ]</button>
                 <button class="terminal-btn" id="closeBtn">[ X ]</button>
             </div>
-            <div id="terminal"></div>
+            <div class="termini" id="commandTerminal"></div>
+            <div id="typeContainer">
+                <label class="radio-label">
+                    <input type="radio" name="choice" value="1" checked>
+                    <span class="terminal-radio"></span>
+                    <i class="fa fa-font" aria-hidden="true"></i>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="choice" value="2">
+                    <span class="terminal-radio"></span>
+                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                </label>
+                <!--<label class="radio-label">
+                    <input type="radio" name="choice" value="3">
+                    <span class="terminal-radio"></span>
+                    <i class="fa fa-picture-o" aria-hidden="true"></i>
+                </label>-->
+            </div>
+            <div class="termini" id="colourTerminal"></div>
+            <div class="termini" id="textTerminal"></div>
         </div>
     </div>
     <script src="node_modules/xterm/lib/xterm.js"></script>

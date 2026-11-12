@@ -1,0 +1,188 @@
+body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    background: transparent;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Courier New", Courier, monospace;
+}
+
+#app-container {
+    width: 60px;
+    height: 60px;
+    background: #1e1e1e;
+    border-radius: 50%;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1), height 0.3s cubic-bezier(0.25, 1, 0.5, 1), border-radius 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #d2d2d2;
+}
+#app-container.expanded {
+    width: 100vw;
+    height: 90vh;
+    border-radius: 12px;
+    background: #1e1e1e;
+}
+
+.open-btn {
+    display: flex;
+    margin: auto;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    color: #d2d2d2;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.3s ease;
+}
+.open-btn:hover {
+    transform: scale(1.1);
+}
+
+.main-content {
+    display: none;
+    padding: 20px;
+}
+
+#app-container.expanded .open-btn {
+    display: none;
+}
+
+.termini {
+  display: block;
+  padding: 10px;
+  overflow-wrap: break-word;
+  width: 200px;
+  height: 16px;
+}
+
+#colourTerminal {
+  opacity: 0;
+  pointer-events: none;
+}
+#colourTerminal.visible {
+    pointer-events: auto;
+    animation: popIn 0.15s ease forwards;
+}
+
+#textTerminal {
+  opacity: 0;
+  pointer-events: none;
+  height: auto;
+}
+#textTerminal.visible {
+    pointer-events: auto;
+    animation: popIn 0.15s ease forwards;
+}
+
+#header {
+    display: flex;
+    justify-content: flex-end;
+    cursor: default;
+    margin: 8px;
+}
+
+.terminal-btn {
+    cursor: pointer;
+    font-weight: bold;
+    background: none;
+    border: none;
+    color: #d2d2d2;
+    z-index: 11;
+    transition: transform 0.3s ease;
+}
+.terminal-btn:hover {
+transform: scale(1.1);
+}
+.terminal-btn:active {
+transform: scale(0.9);
+}
+
+.terminal-container {
+    width: 200px;
+    height: 300px;
+    box-sizing: border-box;
+    overflow: hidden;
+    overflow-wrap: break-word;
+}
+
+.xterm .xterm-viewport::-webkit-scrollbar {
+    display: none;
+}
+
+
+#typeContainer {
+  display: flex;
+  opacity: 0;
+  pointer-events: none;
+  width: 100%;
+  padding: 8px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  animation: none;
+}
+#typeContainer.visible {
+    pointer-events: auto;
+    animation: popIn 0.15s ease forwards;
+}
+
+.radio-label {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 15px;
+  color: #d2d2d2;
+}
+
+.radio-label input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  position: absolute;
+  opacity: 0;
+}
+
+.terminal-radio {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2ch;
+  margin-right: 5px;
+  color: #d2d2d2;
+  font-weight: bold;
+}
+.terminal-radio::before {
+  content: "[ ]";
+  white-space: pre;
+}
+
+.radio-label input[type="radio"]:checked + .terminal-radio::before {
+  content: "[O]";
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes popOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}

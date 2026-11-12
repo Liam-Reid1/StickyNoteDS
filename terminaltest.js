@@ -51,23 +51,10 @@ app.whenReady().then(() => {
   createWindow();
 
   ipcMain.on('execute-custom-command', async (event, command) => {
-    console.log(`Command received: ${command}`);
+    console.log(`Command received: ${JSON.stringify(command)}`);
 
-    // string to args
-    const args = command.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
-    if (args.length === 0) return;
-
-    const baseCommand = args[0].toLowerCase(); // create, grab, hide
-
-    // change this so instead of -w -c it works as -wc
-    const getFlagValue = (flag) => {
-      const index = args.indexOf(flag);
-      if (index !== -1 && index + 1 < args.length) {
-        return args[index + 1].replace(/^"|"$/g, ''); 
-      }
-      return null;
-    };
-
+    const baseCommand = command.command; // create, grab, hide
+    if (baseCommand.length === 0) return;
     try {
       switch (baseCommand) {
         case 'help':
@@ -79,12 +66,12 @@ app.whenReady().then(() => {
           const randomY = Math.floor(Math.random() * 500) + 100;
 
           // Check flags or fall back to defaults
-          const noteText = getFlagValue('-w') || 'New note';
-          const colour = getFlagValue('-c') || 'yellow';
-
+          const type = parseInt(command.type, 10);
+          const noteText = command.text;
+          const colour = command.colour;
           const { data, error } = await supabase
             .from('notes')
-            .insert([{ content: noteText, x_pos: randomX, y_pos: randomY, colour: colour, type: 1, canvas_json: null }]);
+            .insert([{ content: noteText, x_pos: randomX, y_pos: randomY, colour: colour, type: type, canvas_json: null }]);
 
           if (error) throw error;
 
