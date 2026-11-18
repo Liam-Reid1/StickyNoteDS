@@ -1,16 +1,16 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld('electronAPI', {
-    sendTerminalCommand: (data) => ipcRenderer.send('execute-custom-command', data), // renderer to main
-    enableClickThrough: () => ipcRenderer.send('enable-click-through'),
-    disableClickThrough: () => ipcRenderer.send('disable-click-through'),
-    onCloseTerminal: () => ipcRenderer.send('close-terminal'),
+contextBridge.exposeInMainWorld("electronAPI", {
+  sendTerminalCommand: (data) => ipcRenderer.send("execute-custom-command", data), // renderer to main
+  enableClickThrough: () => ipcRenderer.send("enable-click-through"),
+  disableClickThrough: () => ipcRenderer.send("disable-click-through"),
+  onCloseTerminal: () => ipcRenderer.send("close-terminal"),
 
-    onCreateNote: (data) => ipcRenderer.invoke('create-new-note', data),
-    onDeleteNote: (id) => ipcRenderer.invoke('close-and-delete-note', id),
-    onUpdateContent: (data) => ipcRenderer.invoke('update-note-content', data),
-    onLoadContent: (callback) => {
-        ipcRenderer.removeAllListeners('load-note-content');
-        ipcRenderer.on('load-note-content', (event, data) => callback(data));
-    }
+  onCreateNote: (data) => ipcRenderer.invoke("create-new-note", data),
+  onDeleteNote: (id) => ipcRenderer.invoke("close-and-delete-note", id),
+  onUpdateContent: (data) => ipcRenderer.invoke("update-note-content", data),
+  onLoadContent: (callback) => {
+    ipcRenderer.removeAllListeners("load-note-content");
+    ipcRenderer.on("load-note-content", (event, data) => callback(data));
+  },
 });

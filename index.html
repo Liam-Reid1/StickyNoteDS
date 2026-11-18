@@ -1,42 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <link rel="stylesheet" href="terminalstyle.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <head>
+    <link rel="stylesheet" href="terminalstyle.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
     <link rel="stylesheet" href="./node_modules/xterm/css/xterm.css" />
-</head>
-<body>
+  </head>
+  <body>
     <div id="app-container">
-        <div class="open-btn" id="openBtn"><i class="fa fa-sticky-note-o fa-lg" aria-hidden="true"></i></div>
-        <div class="terminal-container" id="terminalContainer" style="display: none;">
-            <div id="header">
-                <button class="terminal-btn" id="minimizeBtn">[ _ ]</button>
-                <button class="terminal-btn" id="closeBtn">[ X ]</button>
-            </div>
-            <div class="termini" id="commandTerminal"></div>
-            <div id="typeContainer">
-                <label class="radio-label">
-                    <input type="radio" name="choice" value="1" checked>
-                    <span class="terminal-radio"></span>
-                    <i class="fa fa-font" aria-hidden="true"></i>
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="choice" value="2">
-                    <span class="terminal-radio"></span>
-                    <i class="fa fa-pencil" aria-hidden="true"></i>
-                </label>
-                <!--<label class="radio-label">
+      <div class="open-btn" id="openBtn">
+        <i class="fa fa-sticky-note-o fa-lg" aria-hidden="true"></i>
+      </div>
+      <div class="terminal-container" id="terminalContainer" style="display: none">
+        <div id="header">
+          <button class="terminal-btn" id="minimizeBtn">[ _ ]</button>
+          <button class="terminal-btn" id="closeBtn">[ X ]</button>
+        </div>
+        <div class="termini" id="commandTerminal"></div>
+        <div id="typeContainer">
+          <label class="radio-label">
+            <input type="radio" name="choice" value="1" checked />
+            <span class="terminal-radio"></span>
+            <i class="fa fa-font" aria-hidden="true"></i>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="choice" value="2" />
+            <span class="terminal-radio"></span>
+            <i class="fa fa-pencil" aria-hidden="true"></i>
+          </label>
+          <!--<label class="radio-label">
                     <input type="radio" name="choice" value="3">
                     <span class="terminal-radio"></span>
                     <i class="fa fa-picture-o" aria-hidden="true"></i>
                 </label>-->
-            </div>
-            <div class="termini" id="colourTerminal"></div>
-            <div class="termini" id="textTerminal"></div>
         </div>
+        <div class="termini" id="colourTerminal"></div>
+        <div class="termini" id="textTerminal"></div>
+      </div>
     </div>
     <script src="node_modules/xterm/lib/xterm.js"></script>
     <script src="node_modules/@xterm/addon-fit/lib/addon-fit.js"></script>
     <script src="renderer.js"></script>
-</body>
+  </body>
 </html>

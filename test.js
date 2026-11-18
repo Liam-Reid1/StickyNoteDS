@@ -1,5 +1,5 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('path');
+const { app, BrowserWindow, ipcMain } = require("electron");
+const path = require("path");
 
 let activeWindows = new Map();
 
@@ -16,28 +16,29 @@ function createNote(id, content, x, y, colour, type) {
     alwaysOnTop: true,
     resizable: false,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
-      nodeIntegration: false
-    }
+      nodeIntegration: false,
+    },
   });
-  win.loadFile('note.html');
+  win.loadFile("note.html");
   activeWindows.set(id, win);
-  win.setAlwaysOnTop(true, 'screen-saver');
+  win.setAlwaysOnTop(true, "screen-saver");
 
   // send content data once webContents finish loading
-  win.webContents.on('did-finish-load', () => {
-    win.webContents.send('load-note-content', { id, content, colour, type });
+  win.webContents.on("did-finish-load", () => {
+    win.webContents.send("load-note-content", { id, content, colour, type });
   });
-  win.on('moved', () => {
+  win.on("moved", () => {
     const [x_pos, y_pos] = win.getPosition();
   });
 
-  win.on('resize', () => { // bug where moving the window slightly increases the window size
+  win.on("resize", () => {
+    // bug where moving the window slightly increases the window size
     win.setContentSize(250, 250); // set it back to 250x250
   });
 
-  win.on('closed', () => {
+  win.on("closed", () => {
     activeWindows.delete(id);
   });
 }
@@ -46,7 +47,6 @@ app.whenReady().then(() => {
   createNote("main", "testing note", 250, 250, "purple", 2);
 });
 
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
 });

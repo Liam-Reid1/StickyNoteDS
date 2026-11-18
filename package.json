@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "lan": "electron main-lan.js",
     "test": "electron test.js",
     "terminal": "electron terminaltest.js"
   },
