@@ -13,14 +13,20 @@ const typeContainer = document.getElementById("typeContainer");
 const availableCommands = ["create", "grab", "hide", "help"];
 const availableColours = [
   "red",
+  "coral",
   "orange",
+  "peach",
   "yellow",
+  "lime",
   "green",
+  "mint",
   "cyan",
   "blue",
+  "lavender",
   "purple",
   "pink",
   "white",
+  "grey",
 ];
 
 const translucentWhite = "\x1b[38;2;128;128;128m";

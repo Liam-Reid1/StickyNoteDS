@@ -247,11 +247,12 @@ app.whenReady().then(() => {
           break;
         }
 
-        case "grab":
+        case "grab": {
           // Pulls all rows from notes
           callSupabase();
           event.reply("execute-custom-command-success", "Fetched latest notes.");
           break;
+        }
 
         case "hide": {
           const allWindows = BrowserWindow.getAllWindows();
@@ -265,10 +266,11 @@ app.whenReady().then(() => {
           break;
         }
 
-        default:
+        default: {
           console.log(`Unknown command: ${baseCommand}`);
           event.reply("execute-custom-command-error", `Unknown command: ${baseCommand}`);
           break;
+        }
       }
     } catch (error) {
       console.error("An error occurred inside the ipcMain handler:", error);

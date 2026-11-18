@@ -8,20 +8,40 @@
   --dark: #e33445;
   --darker: #91000e;
 }
+:root.coral {
+  --light: #ff8c7a;
+  --dark: #f43f5e;
+  --darker: #9f1239;
+}
 :root.orange {
   --light: #ffa930;
   --dark: #bf7207;
   --darker: #754706;
+}
+:root.peach {
+  --light: #fdba74;
+  --dark: #f97316;
+  --darker: #9a3412;
 }
 :root.yellow {
   --light: #fef68a;
   --dark: #eab308;
   --darker: #a16207;
 }
+:root.lime {
+  --light: #bef264;
+  --dark: #84cc16;
+  --darker: #4d7c0f;
+}
 :root.green {
   --light: #74ed4b;
   --dark: #3abd0e;
   --darker: #228700;
+}
+:root.mint {
+  --light: #82f5c5;
+  --dark: #10b981;
+  --darker: #047857;
 }
 :root.cyan {
   --light: #a9edf1;
@@ -32,6 +52,11 @@
   --light: #8ca0ff;
   --dark: #576ede;
   --darker: #2940b4;
+}
+:root.lavender {
+  --light: #c4b5fd;
+  --dark: #8b5cf6;
+  --darker: #5b21b6;
 }
 :root.purple {
   --light: #b485bc;
@@ -47,6 +72,11 @@
   --light: #f5f6f8;
   --dark: #969696;
   --darker: #6a6a6a;
+}
+:root.grey {
+  --light: #cbd5e1;
+  --dark: #64748b;
+  --darker: #334155;
 }
 
 body {
