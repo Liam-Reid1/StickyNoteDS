@@ -10,7 +10,7 @@ const textTerminal = document.getElementById("textTerminal");
 const radioButtons = document.querySelectorAll('input[name="choice"]');
 const typeContainer = document.getElementById("typeContainer");
 
-const availableCommands = ["create", "grab", "hide", "help"];
+const availableCommands = ["create", "grab", "hide", "help", "clear"];
 const availableColours = [
   "red",
   "coral",

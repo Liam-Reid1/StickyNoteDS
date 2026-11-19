@@ -265,6 +265,19 @@ app.whenReady().then(() => {
           event.reply("execute-custom-command-success", "Hidden non-main windows.");
           break;
         }
+        case "clear": {
+          const allWindows = BrowserWindow.getAllWindows();
+          allWindows.forEach((win) => {
+            // Safely close note windows
+            if (typeof mainWindow !== "undefined" && win !== mainWindow) {
+              win.close();
+            }
+          });
+          const { error } = await supabase.from("notes").delete().not("id", "is", null);
+          if (error) throw error;
+          event.reply("execute-custom-command-success", "Destroyed all notes.");
+          break;
+        }
 
         default: {
           console.log(`Unknown command: ${baseCommand}`);
