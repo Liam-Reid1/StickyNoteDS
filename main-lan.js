@@ -15,6 +15,13 @@ let mainWindow;
 let activeWindows = new Map();
 let notesStore = new Map(); // In-memory store replacing the Supabase table
 
+// Check for a custom --profile=<name> argument
+const profileArg = process.argv.find((arg) => arg.startsWith("--profile="));
+if (profileArg) {
+  const profileName = profileArg.split("=")[1];
+  app.setPath("userData", path.join(app.getPath("temp"), `sticky-notes-${profileName}`));
+}
+
 // Helper to broadcast JSON messages over UDP
 function broadcastUDP(action, payload) {
   const message = Buffer.from(
@@ -208,7 +215,7 @@ function createNote(id, content, x, y, colour, type, canvas_json) {
     });
   });
 
-  win.on("move", () => {
+  win.on("moved", () => {
     const [x_pos, y_pos] = win.getPosition();
     const note = notesStore.get(id);
     if (note) {
