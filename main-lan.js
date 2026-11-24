@@ -3,6 +3,7 @@ const path = require("path");
 const crypto = require("crypto");
 const dgram = require("dgram");
 const fs = require("node:fs");
+const os = require("os");
 
 // UDP Multicast Configuration
 const UDP_PORT = 41234;
@@ -22,6 +23,19 @@ if (profileArg) {
   app.setPath("userData", path.join(app.getPath("temp"), `sticky-notes-${profileName}`));
 }
 
+function getLocalIPs() {
+  const interfaces = os.networkInterfaces();
+  const ips = [];
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === "IPv4" && !iface.internal) {
+        ips.push(iface.address);
+      }
+    }
+  }
+  return ips;
+}
+
 // Helper to broadcast JSON messages over UDP
 function broadcastUDP(action, payload) {
   const message = Buffer.from(
@@ -29,13 +43,18 @@ function broadcastUDP(action, payload) {
       sender: INSTANCE_ID,
       action,
       payload,
-    }),
+    })
   );
 
-  udpSocket.send(message, 0, message.length, UDP_PORT, MULTICAST_ADDR, (err) => {
-    if (err) console.error("UDP Broadcast Error:", err);
+  const localIPs = getLocalIPs();
+  localIPs.forEach((ip) => {
+    udpSocket.setMulticastInterface(ip);
+    udpSocket.send(message, 0, message.length, UDP_PORT, MULTICAST_ADDR, (err) => {
+      if (err) console.error(`UDP Broadcast Error on ${ip}:`, err);
+    });
   });
 }
+
 
 // Initialize UDP Listener
 function initUDP() {
@@ -121,9 +140,21 @@ function initUDP() {
   });
 
   udpSocket.bind(UDP_PORT, () => {
-    udpSocket.addMembership(MULTICAST_ADDR);
-    console.log(`Listening for notes on UDP ${MULTICAST_ADDR}:${UDP_PORT}`);
-    // Ask peers on the network for any existing notes on startup
+    const localIPs = getLocalIPs();
+    
+    localIPs.forEach((ip) => {
+      try {
+        udpSocket.addMembership(MULTICAST_ADDR, ip);
+        console.log(`Joined multicast ${MULTICAST_ADDR} on interface ${ip}`);
+      } catch (err) {
+        console.warn(`Could not join multicast on ${ip}:`, err.message);
+      }
+    });
+
+    // Set Time-To-Live so packets can traverse local network switches
+    udpSocket.setMulticastTTL(128);
+    udpSocket.setMulticastLoopback(true);
+
     broadcastUDP("SYNC_REQUEST", {});
   });
 }
